@@ -14,7 +14,7 @@ D=9.0; %Transition piece 8.5m, pile 9.0
 Nz=40;
 
 %% Regular or irregular waves
-if 0                                       % change to 0 for irregular waves
+if 1                                       % change to 0 for irregular waves
     % regular waves
     H=6; %was 1 changed to 6
     T=12;%was 11 changed to 12
@@ -68,7 +68,7 @@ else
     plot(f,S)
     xlabel('f [Hz]')
     ylabel('S_{\eta} [m^2/Hz]');
-    str = ['Q6: Wave Spectum, fs= ',num2str(fp),', Hs= ',num2str(Hs)];
+    str = ['Wave Spectum, fs= ',num2str(fp),', Hs= ',num2str(Hs)];
     title(str)
     grid on
         
@@ -101,11 +101,15 @@ u_bed = zeros(size(t));
 u_free = zeros(size(t));
 ut_bed = zeros(size(t));
 ut_free = zeros(size(t));
+%Q5: run twice - without and with wheeler stretching
+for no_wheeler = 0:1 %0=with strethcing, 1=no stretching
+      
+
 % loop for calculation of free surface elevation and inline force
 for j = 1:length(t)
     Eta(j) = sum(    a.*cos(omega.*t(j)+epsilon)    ) ;    
     zPhys=linspace(-h,Eta(j),Nz);
-    if 0 % no Wheeler stretching. We use the physical z-values for calculation of kinematics. Change to 0 for Wheeler stretching.
+    if no_wheeler % no Wheeler stretching. We use the physical z-values for calculation of kinematics. Change to 0 for Wheeler stretching.
         zCalc = zPhys;
     else % Wheeler stretching.              
         zCalc = h.*(zPhys-Eta)./(h+Eta);                       % Change zCalc here for question 5
@@ -129,19 +133,64 @@ for j = 1:length(t)
     end
     Fx(j)=trapz(zPhys,dfx);
     % My(j)= ...                           % complete this one for question 11 
+    
+   end
+if no_wheeler % no Wheeler stretching. We use the physical z-values for calculation of kinematics. Change to 0 for Wheeler stretching.
+       %figure(10)
+        %plot(t, Fx)
+       %title('no wheeler')     
+       Fx_nowh= Fx;        
+else
+        %figure(11)
+        %plot(t, Fx)
+       %title('yes wheeler')
+       Fx_wh= Fx;        
 end
+end
+
+
 
 %% Make some plots
 
-figure(2), clf
-subplot(2,1,1), hold on
-plot(t,Eta,'b')
-xlabel('t [s]')
-ylabel('\eta [m]')
+figure(12), clf
 
-str = ['Q6: Free surface eleveation, fs= ',num2str(fp),', Hs= ',num2str(Hs)];
+plot(t,Fx_nowh/1e6,'.k')
+hold on
+plot(t,Fx_wh/1e6,'-r')
+hold on
+    xlabel('t [s]')
+    ylabel('Force [MN]')
+legend('No stretching', 'With stretching')
+str = 'Q5: Inline force';
 title(str)
 grid on
+
+
+
+if(false)
+figure(2), clf
+subplot(2,1,1), hold on
+plot(t,Fx_nowh,'k')
+    xlabel('t [s]')
+    ylabel('Force [N]')
+str = 'Inline force - no stretching';
+title(str)
+grid on
+
+
+
+subplot(2,1,2), hold on
+    plot(t,Fx,'k')
+    xlabel('t [s]')
+    ylabel('Force [N]')
+    str = ['Inline force  - with stretching'];
+    title(str)
+    grid on
+    
+end
+
+
+
 
 if false
     subplot(3,1,2), hold on
@@ -154,15 +203,6 @@ if false
 end
 
 
-if true
-    subplot(2,1,2), hold on
-    plot(t,Fx/1e6,'k')
-    xlabel('t [s]')
-    ylabel('Force [MN]')
-    str = ['Q6: Inline force, fs= ',num2str(fp),', Hs= ',num2str(Hs)];
-    title(str)
-    grid on
-end
 
 if false
 subplot(3,1,3), hold on
@@ -208,13 +248,13 @@ end
 %grid on
 
 %% Make some statistics
-'eta Fx My'
+%'eta Fx My'
 
-'mean   ', [mean(Eta) mean(Fx) ]
-'std    ', [std(Eta)  std(Fx) ]
-'min    ', [min(Eta)  min(Fx) ]
-'max    ', [max(Eta)  max(Fx) ]
+%'mean   ', [mean(Eta) mean(Fx) ]
+%'std    ', [std(Eta)  std(Fx) ]
+%'min    ', [min(Eta)  min(Fx) ]
+%'max    ', [max(Eta)  max(Fx) ]
 
 
-'Hs and 4*std(Eta)', [Hs 4*std(Eta) ]
+%'Hs and 4*std(Eta)', [Hs 4*std(Eta) ]
 
