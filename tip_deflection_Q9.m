@@ -11,7 +11,8 @@ sigma1 = TI*V; %wind standard deviation
 Cl =  0.5; %mean lift coefficient 
 Cd = 0.02; %drag coefficient throughout the blade, 
 theta = 90.0; %deg relative angle
-S_aero = (Cl*cos(theta) + Cd*sin(theta))^2;
+theta_rad = theta*pi/180.0; %deg relative angle
+S_aero = (Cl*cos(theta_rad) + Cd*sin(theta_rad))^2; 
 
 f_n = 0.63;    %Hz, blade natural frequency, DTU 10MW RWT: 0.627798Hz = 1st Blade Collective Flap	
 w_n = f_n*2*pi; %rad/s blade natural frequency
@@ -21,9 +22,9 @@ chi = 0.7; %aerodynamic transfer function is 0.7.
 S_factor = rho^2 * V^2 * chord^2 * chi^2;
 
 %Turbulence scale parameters:
-Kappa1 = 42;%m, Kappa1=42m at hub height for z>42m (section 6.3 of 614100-1)
-L1 = 8.1 * Kappa1; %Table B.1 of 61400-1
-Lc = 8.1 * Kappa1; %coherence scale parameter 
+Lambda1 = 42;%m, Lambda1=42m at hub height for z>60m (section 6.3 of 614100-1)
+L1 = 8.1 * Lambda1; %Table B.1 of 61400-1
+Lc = 8.1 * Lambda1; %coherence scale parameter 
 
 %function of mode shape and correlation
 fun = @(r1,r2)...
@@ -37,7 +38,7 @@ S_I = integral2(fun,0,bl,0,bl);
 %Kaimal spectra (from 614100-1 eq B.14) 
 %with frequency in Hz
 %NON-dimensional
-S1_Kaimal_nondim = (4*sigma1^2*L1/V)/(1+6*f_n*L1/V)^(5/3);
+S1_Kaimal_nondim = (4*f_n*L1/V)/(1+6*f_n*L1/V)^(5/3);
 %Dimensional S(f) is:
 S1_Kaimal = S1_Kaimal_nondim*(sigma1^2)/f_n;
 
@@ -77,6 +78,14 @@ xlabel('blade length (m)')
 ylabel('mode shape (m)')
 grid on
 
+figure(2)
+plot(x,y,'*')
+hold on
+
+title('Blade mode shape')
+xlabel('blade length')
+ylabel('mode shape')
+grid on
 
 
 
